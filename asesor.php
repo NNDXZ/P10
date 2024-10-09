@@ -130,6 +130,7 @@ $data_asesor = $stmt->fetchAll();
 <div class="col-md-9 col-lg-10 content">
     <h2 class="mb-4">Manajemen Data Asesor</h2>
     <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addModal">Tambah</button>
+    <a href="lihatasesor.php" class="btn btn-info mb-3 ml-2">Lihat Data Asesor</a>
     
     <div class="table-responsive">
         <table id="asesorTable" class="table table-striped table-bordered">
@@ -276,17 +277,21 @@ $(document).ready(function() {
     $('.edit-btn').click(function() {
     var id = $(this).data('id');
     $.ajax({
-        url: 'get_asesor.php',
+        url: 'get_asesor.php', // Pastikan path ini benar
         method: 'GET',
         data: {id: id},
         dataType: 'json',
         success: function(data) {
-            $('#edit_id').val(data.id);
-            $('#edit_nama_asesor').val(data.nama_asesor);
-            $('#edit_no_registrasi').val(data.no_registrasi);
-            $('#edit_alamat').val(data.alamat);
-            $('#edit_status').val(data.status);
-            $('#editModal').modal('show');
+            if (data.error) {
+                alert(data.error);
+            } else {
+                $('#edit_id').val(data.id);
+                $('#edit_nama_asesor').val(data.nama_asesor);
+                $('#edit_no_registrasi').val(data.no_registrasi);
+                $('#edit_alamat').val(data.alamat);
+                $('#edit_status').val(data.status);
+                $('#editModal').modal('show');
+            }
         },
         error: function(xhr, status, error) {
             console.error("Error: " + error);
