@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biodata</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Roboto", sans-serif;
+        }
+
+        header {
+            position: fixed;
+            background: #22242A;
+            padding: 20px;
+            width: 100%;
+            height: 30px;
+        }
+
+        img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        tbody {
+            font-size: 17px;
+            font-weight: 300;
+            color: #e8e8e8;
+        }
+
+        .tabelku {
+            width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .tabelb {
+            width: auto;
+            margin: auto;
+        }
+
+        .left_area span {
+            color: #9f2ebb;
+        }
+
+        .left_area h3 {
+            color: #fff;
+            margin: 0;
+            text-transform: uppercase;
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .right_area img {
+            padding: 5px;
+            float: right;
+            margin-top: -47px;
+            margin-right: 40px;
+        }
+
+        .sidebar {
+            background: #2f323a;
+            margin-top: 70px;
+            padding-top: 30px;
+            position: fixed;
+            left: 0;
+            width: 250px;
+            height: 100%;
+        }
+
+        .sidebar .profile_image {
+            width: 100px;
+            height: 100px;
+            border-radius: 100px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar h4 {
+            color: #ccc;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            color: #fff;
+            display: block;
+            width: 100%;
+            line-height: 60px;
+            text-decoration: none;
+            padding-left: 40px;
+            box-sizing: border-box;
+            transition: 0.5s;
+            transition-property: background;
+        }
+
+        .sidebar a:hover {
+            background: #9f2ebb;
+        }
+
+        .sidebar i {
+            padding-right: 10px;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding-top: 70px;
+            background: url(bcg.jpg);
+            background-position: center;
+            background-size: cover;
+            height: 125vh;
+        }
+
+        .box {
+            width: 740px;
+            margin: 0 auto;
+            margin-top: 30px;
+            box-shadow: 0 0.30rem 0.75rem rgba(5, 5, 5, 5);
+            transition: all .3s;
+            background-color: #591869;
+            border: solid 5px #ea92ff;
+            border-top-right-radius: 80px;
+            border-bottom-left-radius: 80px;
+        }
+
+        .box:hover {
+            background-color: #1f8a45;
+            border: solid 5px #4fd47e;
+            border-top-left-radius: 80px;
+            border-bottom-right-radius: 80px;
+            border-top-right-radius: 0px;
+            border-bottom-left-radius: 0px;
+        }
+
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #22242A;
+            color: #e8e8e8;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="left_area">
+            <h3>Pemrograman <span>Web</span></h3>
+        </div>
+        <div class="right_area">
+            <img src="unusa.png" width="50px" height="50px">
+        </div>
+    </header>
+    <div class="sidebar">
+        <center>
+            <img src="logo 3.png" class="profile_image" alt="asyrof">
+            <h4>SDM TIK</h4>
+        </center>
+        <a href="tuk.php"><i class="fas fa-desktop"></i><span>TUK</span></a>
+        <a href="asesor.php"><i class="fas fa-table"></i><span>Asesor</span></a>
+        <a href="mitra.php"><i class="fas fa-list-ul"></i><span>Mitra</span></a>
+        <a href="formdaftar.html"><i class="fas fa-pencil-alt"></i><span>Formulirku</span></a>
+        <a href="login.html"><i class="fas fa-sign-out-alt"></i><span>Keluar</span></a>
+    </div>
+
+    <div class="content">
+        <div class="box">
+            <h2 style="color: #fff; text-align: center; padding-top: 20px;">Data TUK dan Asesor</h2>
+            <table border="1" cellspacing="0" cellpadding="10" style="width: 90%; margin: 20px auto; color: #fff;">
+                <tr style="background-color: #22242A;">
+                    <th>No</th>
+                    <th>Nama TUK</th>
+                    <th>Alamat</th>
+                    <th>Nama Asesor</th>
+                    <th>No. Registrasi</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>LSP Teknologi Digital</td>
+                    <td>Jl. Raya Kedung Baruk No.98, Surabaya</td>
+                    <td>Dr. Ahmad Susanto, M.Kom</td>
+                    <td>REG.BNSP.123.2021</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>TUK Universitas Nahdlatul Ulama Surabaya</td>
+                    <td>Jl. Jemursari No.51-57, Surabaya</td>
+                    <td>Ir. Siti Aminah, M.T</td>
+                    <td>REG.BNSP.456.2021</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Balai Latihan Kerja Surabaya</td>
+                    <td>Jl. Dukuh Menanggal III/29, Surabaya</td>
+                    <td>Drs. Budi Santoso, M.Pd</td>
+                    <td>REG.BNSP.789.2021</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    </div>
+    <div class="footer">
+        <h3>Copyright © 2021 Moch. Shohibul Asyrof</h3>
+    </div>
+</body>
+
+</html>
