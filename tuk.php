@@ -118,7 +118,7 @@ $data_tuk = $stmt->fetchAll();
                     <li class="nav-item"><a class="nav-link active" href="#">TUK</a></li>
                     <li class="nav-item"><a class="nav-link" href="asesor.php">Asesor</a></li>
                     <li class="nav-item"><a class="nav-link" href="mitra.php">Mitra</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Formulirku</a></li>
+                    <li class="nav-item"><a class="nav-link" href="nambah.php">Tambah</a></li>
                     <li class="nav-item"><a class="nav-link" href="login.html">Keluar</a></li>
                 </ul>
             </div>

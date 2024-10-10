@@ -1,5 +1,11 @@
 <?php
-include "koneksi.php";
+#include 'admin_middleware.php';#
+
+// Koneksi ke database
+$host = 'localhost';
+$dbname = 'db_users'; // Ubah nama database menjadi db_users
+$username = 'root';
+$password = '';
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
@@ -7,141 +13,283 @@ try {
 } catch (PDOException $e) {
     die("Koneksi gagal: " . $e->getMessage());
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['add'])) {
+        // Proses penambahan data
+        $fullname = $_POST['fullname'];
+        $username = $_POST['username'];
+        $institution = $_POST['institution'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        
+        $stmt = $conn->prepare("INSERT INTO tbl_users (fullname, username, institution, email, password) VALUES (:fullname, :username, :institution, :email, :password)");
+        $stmt->bindParam(':fullname', $fullname);
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':institution', $institution);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':password', $password);
+        $stmt->execute();
+
+        // Setelah pemrosesan selesai, lakukan redirect
+        header('Location: nambah.php?status=success&message=Data pengguna berhasil ditambahkan');
+        exit();
+    } elseif (isset($_POST['update'])) {
+        // Proses update data
+        $id = $_POST['id'];
+        $fullname = $_POST['fullname'];
+        $username = $_POST['username'];
+        $institution = $_POST['institution'];
+        $email = $_POST['email'];
+        
+        $stmt = $conn->prepare("UPDATE tbl_users SET fullname = :fullname, username = :username, institution = :institution, email = :email WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':fullname', $fullname);
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':institution', $institution);
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+
+        // Setelah pemrosesan selesai, lakukan redirect
+        header('Location: nambah.php?status=success&message=Data pengguna berhasil diperbarui');
+        exit();
+    }
+}
+
+// Proses DELETE
+if (isset($_GET['delete'])) {
+    $id = $_GET['delete'];
+    $stmt = $conn->prepare("DELETE FROM tbl_users WHERE id = :id");
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+
+    // Redirect setelah menghapus
+    header('Location: nambah.php?status=success&message=Data pengguna berhasil dihapus');
+    exit();
+}
+
+// Ambil semua pengguna
+$stmt = $conn->prepare("SELECT * FROM tbl_users");
+$stmt->execute();
+$users = $stmt->fetchAll();
 ?>
-<!-- SweetAlert2 -->
-<div class="info-data" data-infodata="<?php if(isset($_SESSION['info'])){ 
-  echo $_SESSION['info']; 
-  } 
-  unset($_SESSION['info']); ?>">
-</div>
 
-<div class="container-fluid pt-3 pb-5 backGambar">
-  <div class="row">
-    <div class="col-xl-12">
-      <h3 class="text-center text-uppercase text-dark">Rekapitulasi Data Pengguna</h3>
-      <hr class="hr">
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Data Pengguna</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+    <style>
+        .sidebar {
+            height: 100vh;
+            background-color: #343a40;
+            color: white;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            color: #f8f9fa;
+        }
+        .content {
+            padding: 20px;
+        }
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="text-center mb-4">
+                    <img src="logo 3.png" alt="Moch. Shohibul Asyrof" class="profile-image">
+                    <h5>SDM TIK</h5>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link active" href="tuk.php">TUK</a></li>
+                    <li class="nav-item"><a class="nav-link" href="asesor.php">Asesor</a></li>
+                    <li class="nav-item"><a class="nav-link" href="mitra.php">Mitra</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Tambah</a></li>
+                    <li class="nav-item"><a class="nav-link" href="login.html">Keluar</a></li>
+                </ul>
+            </div>
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 content">
+                <h2 class="mb-4">Manajemen Data Pengguna</h2>
+                <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#addModal">Tambah</button>
+                
+                <div class="table-responsive">
+                    <table id="usersTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Nama Lengkap</th>
+                                <th>Username</th>
+                                <th>Institusi</th>
+                                <th>Email</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($users as $index => $user): ?>
+                            <tr>
+                                <td><?= $index + 1 ?></td>
+                                <td><?= htmlspecialchars($user['fullname'] ?? '') ?></td>
+                                <td><?= htmlspecialchars($user['username'] ?? '') ?></td>
+                                <td><?= htmlspecialchars($user['institution'] ?? '') ?></td>
+                                <td><?= htmlspecialchars($user['email'] ?? '') ?></td>
+                                <td>
+    <button class="btn btn-sm btn-info edit-btn" data-id="<?= htmlspecialchars($user['id'] ?? '') ?>">Edit</button>
+    <button class="btn btn-sm btn-danger delete-btn" data-id="<?= htmlspecialchars($user['id'] ?? '') ?>">Hapus</button>
+</td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-xl-10 table-responsive">
-      <button type="button" class="btn btn-primary btn-sm px-2 my-3" data-toggle="modal" data-target="#staticBackdrop" title="tambah data">
-        <i class="fas fa-plus"></i>&nbsp;Tambah&nbsp;&nbsp;
-      </button>
+    <?php
+    // Tampilkan pesan jika ada
+    if (isset($_GET['status']) && $_GET['status'] === 'success') {
+        echo '<div class="alert alert-success">' . htmlspecialchars($_GET['message']) . '</div>';
+    }
+    ?>
 
-      <table class="table table-bordered table-hover" id="login">
-        <thead>
-          <tr class="text-center">
-            <th width="5%">No.</th>
-            <th>Nama Lengkap</th>
-            <th>Username</th>
-            <th>Institusi</th>
-            <th>Email</th>
-            <th>Level</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-
-        <tbody>
-  <?php
-  $no = 1;
-  $sql = "SELECT * FROM tbl_users a INNER JOIN level b ON a.id_level=b.id_level";
-  $query = $conn->query($sql); // Menggunakan $conn dari koneksi.php
-  while ($data = $query->fetch(PDO::FETCH_ASSOC)) {
-    $id = $data['id'];
-  ?>
-    <tr>
-      <td align="center" width="3%"><?= $no++; ?>.</td>
-      <td><?= $data['fullname']; ?></td>
-      <td><?= $data['username']; ?></td>
-      <td><?= $data['institution']; ?></td>
-      <td><?= $data['email']; ?></td>
-      <td><?= $data['level']; ?></td>
-      <td align="center" width="15%">
-        <?php
-        if($data['username']!="admin"){?>
-          <a href="login-edit.php?id=<?= $data['id']; ?>" class="badge badge-primary p-2" title="Edit"><i class="fas fa-edit"></i></a> 
-          | 
-          <a href="login-delete.php?id=<?= $data['id']; ?>" class="badge badge-danger p-2 delete-data" title='Delete'><i class="fas fa-trash"></i></a>
-          <?php
-        }?>
-      </td>
-    </tr>
-  <?php
-  } ?>
-</tbody>
-      </table>
+    <!-- Modal untuk menambah data -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Pengguna Baru</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" class="form-control" name="fullname" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Institusi</label>
+                            <input type="text" class="form-control" name="institution" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" name="add" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
+    <!-- Modal untuk mengedit data -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Pengguna</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="edit_id">
+                        <div class="form-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" class="form-control" name="fullname" id="edit_fullname" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" class="form-control" name="username" id="edit_username" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Institusi</label>
+                            <input type="text" class="form-control" name="institution" id="edit_institution" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" name="email" id="edit_email" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" name="update" class="btn btn-primary">Perbarui</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#usersTable').DataTable({
+                "language": {
+                    "lengthMenu": "Tampilkan _MENU_ entri",
+                    "search": "Cari:",
+                    "paginate": {
+                        "first": "Pertama",
+                        "last": "Terakhir",
+                        "next": "Selanjutnya",
+                        "previous": "Sebelumnya"
+                    }
+                }
+            });
 
-<!-- Modal Tambah-->
-<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="staticBackdropLabel">
-					Input Pengguna Baru
-				</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
+            // Fungsi untuk mengisi modal edit
+            $('.edit-btn').click(function() {
+                var id = $(this).data('id');
+                // Di sini Anda perlu mengambil data dari server berdasarkan ID
+                // dan mengisi form edit. Contoh sederhana:
+                $('#edit_id').val(id);
+                $('#edit_fullname').val('Nama Lengkap ' + id);
+                $('#edit_username').val('username' + id);
+                $('#edit_institution').val('Institusi ' + id);
+                $('#edit_email').val('email' + id + '@example.com');
+                $('#editModal').modal('show');
+            });
 
-			<div class="modal-body">
-				<form action="login-simpan.php" method="post">
-					<div class="input-group mb-1">
-						<span class="input-group-text lebar">Nama Lengkap</span>
-            <input type="text" name="fullname" class="form-control form-control-sm" placeholder="Input Nama Lengkap" autocomplete="off" required>
-					</div>
-			
-          <div class="input-group input-group-sm mb-1">
-						<span class="input-group-text lebar">Username</span>
-						<input type="text" name="username" class="form-control form-control-sm" placeholder="Input Username" autocomplete="off" required>
-					</div>
-
-          <div class="input-group mb-1">
-						<span class="input-group-text lebar">Institusi</span>
-						<input type="text" name="institution" class="form-control form-control-sm" placeholder="Input Institusi" required>
-					</div>
-
-          <div class="input-group mb-1">
-						<span class="input-group-text lebar">Email</span>
-						<input type="email" name="email" class="form-control form-control-sm" placeholder="Input Email" required>
-					</div>
-
-          <div class="input-group mb-1">
-						<span class="input-group-text lebar">Password</span>
-						<input type="password" name="password" class="form-control form-control-sm" placeholder="Input Password" required>
-					</div>
-
-          <div class="input-group mb-1">
-						<span class="input-group-text lebar">Level</span>
-						<select name="id_level" class="form-control form-control-sm" required>
-							<option value="" selected>~ Pilih Level ~</option>
-							<option value=1>Administrator</option>
-							<option value=2>Pengguna</option>
-						</select>
-					</div>
-
-					<div class="modal-footer">
-						<button type="submit" class="btn btn-primary btn-sm">&nbsp;<i class="fas fa-save"></i>&nbsp;&nbsp;Simpan&nbsp;&nbsp;</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
-
-<script>
-	$(document).ready(function() {
-		$('#login').dataTable();
-
-		$('.form-control-chosen').chosen({
-			allow_single_deselect: true,
-		});
-
-	});
-</script>
+            // Fungsi untuk konfirmasi hapus
+            $('.delete-btn').click(function() {
+                var id = $(this).data('id');
+                if (confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
+                    window.location.href = 'nambah.php?delete=' + id;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
